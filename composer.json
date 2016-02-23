@@ -1,0 +1,22 @@
+{
+    "name": "vilartoni/stackphp-xhprof",
+    "description": "Stack middleware for Xhprof library",
+    "keywords": [ "stack", "xhprof", "debug", "profiler" ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Antonio Vilar",
+            "email": "tonivilar@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "symfony/http-foundation": "~2.1",
+        "symfony/http-kernel": "~2.1",
+        "pimple/pimple": "~1.0",
+        "lox/xhprof": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "Avs\\Stack\\": "src" }
+    }
+}
