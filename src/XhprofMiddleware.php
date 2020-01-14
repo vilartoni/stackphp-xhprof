@@ -2,28 +2,29 @@
 
 namespace Avs\Stack;
 
-use Pimple;
 use iXHProfRuns;
-use Avs\Stack\XhprofMiddleware\ContainerConfig;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use XHProfRuns_Default;
 
 class XhprofMiddleware implements HttpKernelInterface
 {
+    const DEFAULT_OUTPUT_DIRECTORY = 'xhprof/xhprof_html';
+
     /** @var HttpKernelInterface */
     private $app;
 
-    /** @var Pimple */
-    private $container;
+    /** @var string */
+    private $outputDirectory;
 
     /**
      * @param HttpKernelInterface $app
-     * @param array               $options
+     * @param string              $outputDirectory
      */
-    public function __construct(HttpKernelInterface $app, array $options = [])
+    public function __construct(HttpKernelInterface $app, $outputDirectory = null)
     {
         $this->app = $app;
-        $this->container = $this->setupContainer($options);
+        $this->outputDirectory = isset($outputDirectory) ? $outputDirectory : self::DEFAULT_OUTPUT_DIRECTORY;
     }
 
     /**
@@ -61,36 +62,17 @@ class XhprofMiddleware implements HttpKernelInterface
         $profilerNamespace = preg_replace('/[^(a-zA-Z0-9)]/', '_', $request->getRequestUri());
 
         /** @var iXHProfRuns $xhprofRuns */
-        $xhprofRuns = $this->container['ixhprof_runs'];
+        $xhprofRuns = new XHProfRuns_Default();
 
         $runId = $xhprofRuns->save_run($xhprofData, $profilerNamespace);
 
         $profilerUrl = sprintf(
             '%s/index.php?run=%s&source=%s',
-            $this->container['output_dir'],
+            $this->outputDirectory,
             $runId,
             $profilerNamespace
         );
 
         return sprintf('<a href="%s" target="_blank">View XHProf</a>', $profilerUrl);
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return Pimple
-     */
-    private function setupContainer(array $options)
-    {
-        $container = new Pimple();
-
-        $config = new ContainerConfig();
-        $config->process($container);
-
-        foreach ($options as $name => $value) {
-            $container[$name] = $value;
-        }
-
-        return $container;
     }
 }

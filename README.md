@@ -31,7 +31,7 @@ require_once __DIR__ . '../vendor/autoload.php';
 $app = new Silex\Application();
 
 $stack = (new Stack\Builder())
-    ->push(XhprofMiddleware::class, ['output_dir' => '/secret/xhprof']);
+    ->push(XhprofMiddleware::class, '/secret/xhprof');
 
 $app = $stack->resolve($app);
 
